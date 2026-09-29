@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101010">
+  <title>Magnetfeld-Werkstatt | Physik 5</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101010;
+      --panel: #1b1b1b;
+      --panel-2: #222;
+      --line: #3a3a3a;
+      --text: #f6f4ef;
+      --muted: #c6c2b9;
+      --orange: #ff8a00;
+      --orange-soft: #ffb34d;
+      --good: #7bd99a;
+      --bad: #ff8f82;
+      --blue: #91d7ff;
+      --radius: 18px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--orange-soft); }
+    .skip-link { position: absolute; left: -9999px; top: 0; }
+    .skip-link:focus { left: 1rem; top: 1rem; z-index: 99; background: #000; padding: .7rem; }
+    header {
+      border-bottom: 1px solid #303030;
+      background: linear-gradient(120deg, #151515 0%, #20180f 100%);
+    }
+    .topbar, main, footer { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { font-weight: 850; letter-spacing: .02em; color: var(--text); }
+    .brand span { color: var(--orange); }
+    nav { display: flex; flex-wrap: wrap; gap: .35rem; }
+    nav a { color: var(--text); text-decoration: none; padding: .4rem .65rem; border-radius: 999px; font-size: .9rem; }
+    nav a:hover, nav a:focus-visible { background: #333; outline: 2px solid var(--orange); }
+    .hero { padding: 54px 0 42px; }
+    .eyebrow { color: var(--orange-soft); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: .78rem; }
+    h1 { font-size: clamp(2.2rem, 5vw, 4.1rem); line-height: 1.04; margin: .65rem 0 1rem; max-width: 780px; }
+    h1 span { color: var(--orange); }
+    .hero p { color: var(--muted); max-width: 690px; font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.3rem; }
+    .btn {
+      border: 1px solid #555; border-radius: 12px; background: #242424; padding: .68rem 1rem;
+      cursor: pointer; font-weight: 750; text-decoration: none; display: inline-flex; align-items: center; gap: .45rem;
+    }
+    .btn:hover, .btn:focus-visible { border-color: var(--orange); outline: 2px solid var(--orange); outline-offset: 2px; }
+    .btn.primary { background: var(--orange); border-color: var(--orange); color: #17110a; }
+    .btn.primary:hover, .btn.primary:focus-visible { background: #ffa329; }
+    .btn:disabled { opacity: .48; cursor: not-allowed; }
+    main { padding-bottom: 3rem; }
+    section { margin: 30px 0 56px; scroll-margin-top: 18px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+    .section-head h2 { font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1.15; margin: 0; }
+    .section-head p { margin: .4rem 0 0; max-width: 700px; color: var(--muted); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(16px, 3vw, 25px); }
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pill { display: inline-flex; align-items: center; gap: .35rem; border-radius: 999px; padding: .25rem .65rem; background: #302113; color: var(--orange-soft); font-size: .8rem; font-weight: 800; }
+    .lead { color: var(--muted); }
+    .progress-wrap { margin: .8rem 0 1.1rem; }
+    .progress-label { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .88rem; margin-bottom: .35rem; }
+    progress { width: 100%; height: 10px; border: 0; border-radius: 99px; overflow: hidden; accent-color: var(--orange); }
+    progress::-webkit-progress-bar { background: #373737; border-radius: 99px; }
+    progress::-webkit-progress-value { background: var(--orange); border-radius: 99px; }
+    progress::-moz-progress-bar { background: var(--orange); border-radius: 99px; }
+    .level-card { position: relative; overflow: hidden; }
+    .level-card h3 { margin: .25rem 0 .35rem; font-size: 1.2rem; }
+    .level-card p { color: var(--muted); min-height: 3.1em; margin: .25rem 0 1rem; }
+    .level-card.locked { opacity: .58; }
+    .level-card.active { border-color: var(--orange); box-shadow: 0 0 0 1px var(--orange) inset; }
+    .stars { font-size: 1.4rem; letter-spacing: .12em; color: var(--orange); }
+    .task-box { margin-top: 16px; display: none; }
+    .task-box.open { display: block; }
+    .task-title { color: var(--orange-soft); font-size: .82rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+    .question { font-size: 1.15rem; font-weight: 800; margin: .4rem 0 1rem; }
+    .answers { display: grid; gap: 9px; }
+    .answer-btn { text-align: left; background: #262626; border: 1px solid #555; padding: .78rem .9rem; border-radius: 11px; cursor: pointer; }
+    .answer-btn:hover, .answer-btn:focus-visible { border-color: var(--orange); outline: 2px solid var(--orange); outline-offset: 1px; }
+    .answer-btn.correct { border-color: var(--good); background: #15271c; }
+    .answer-btn.incorrect { border-color: var(--bad); background: #2d1917; }
+    .feedback { min-height: 1.6em; margin: .8rem 0 0; font-weight: 750; }
+    .feedback.good { color: var(--good); }
+    .feedback.bad { color: var(--bad); }
+    .task-controls { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .7rem; }
+    .experiment-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(250px, .8fr); gap: 16px; align-items: stretch; }
+    .lab-stage { padding: 10px; border: 1px solid #444; background: #111; border-radius: 14px; overflow: hidden; }
+    #fieldLab { display: block; width: 100%; height: auto; min-height: 280px; touch-action: none; cursor: crosshair; }
+    #fieldLab .path { fill: none; stroke: #ff9b2f; stroke-width: 2; opacity: .82; marker-end: url(#arrow); transition: opacity .35s; }
+    #fieldLab .path.hidden-lines { opacity: 0; }
+    #fieldLab .file { stroke: #f0d3a9; stroke-width: 3; stroke-linecap: round; opacity: 0; transition: opacity .4s; }
+    #fieldLab .file.visible { opacity: .84; }
+    #fieldLab .magnet-left { fill: #d6d6d6; }
+    #fieldLab .magnet-right { fill: #3e3e3e; }
+    #fieldLab .pole-letter { fill: #111; font-weight: 900; font-size: 19px; pointer-events: none; }
+    #fieldLab .pole-letter.light { fill: #f4f4f4; }
+    #fieldLab .compass { cursor: grab; }
+    #fieldLab .compass.dragging { cursor: grabbing; }
+    #fieldLab .compass-ring { fill: #f3eee3; stroke: #ff8a00; stroke-width: 3; }
+    #fieldLab .needle-n { fill: #d63124; }
+    #fieldLab .needle-s { fill: #222; }
+    #fieldLab .needle-hub { fill: #ff8a00; stroke: #171717; stroke-width: 1; }
+    #fieldLab .stage-label { fill: #eee; font-size: 13px; }
+    .controls { display: grid; align-content: start; gap: 10px; }
+    .controls .btn { width: 100%; justify-content: flex-start; }
+    .readout { border-left: 3px solid var(--orange); padding: .3rem .75rem; color: var(--muted); background: #222; border-radius: 0 9px 9px 0; }
+    .readout strong { color: var(--text); }
+    .mini-note { color: var(--muted); font-size: .88rem; }
+    .key { display: inline-block; border: 1px solid #777; border-radius: 5px; padding: 0 .35rem; color: var(--text); font-size: .8rem; }
+    .quiz-q { border-top: 1px solid #383838; padding-top: 16px; margin-top: 16px; }
+    .quiz-q:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+    .quiz-q legend { font-weight: 800; margin-bottom: .45rem; }
+    .quiz-options { display: grid; gap: 7px; }
+    .quiz-options label { display: flex; gap: .65rem; align-items: start; border: 1px solid #494949; background: #232323; border-radius: 10px; padding: .65rem .75rem; cursor: pointer; }
+    .quiz-options label:hover { border-color: var(--orange); }
+    .quiz-options input { accent-color: var(--orange); margin-top: .25rem; }
+    .result { display: none; margin-top: 16px; padding: 14px; border-radius: 12px; background: #292014; border: 1px solid #996019; }
+    .result.show { display: block; }
+    .result h3 { margin: 0 0 .4rem; }
+    .result ul { margin: .5rem 0 0; padding-left: 1.2rem; color: var(--muted); }
+    .privacy { border: 1px solid #4a4032; border-radius: 12px; padding: 12px 14px; background: #211b13; color: var(--muted); font-size: .9rem; }
+    footer { border-top: 1px solid #333; color: var(--muted); font-size: .85rem; padding: 20px 0 34px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; padding: 12px 0; flex-direction: column; }
+      .grid.two, .grid.three, .experiment-layout { grid-template-columns: 1fr; }
+      .level-card p { min-height: auto; }
+      #fieldLab { min-height: 210px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+  <header>
+    <div class="topbar">
+      <div class="brand">PHYSIK<span>LABOR</span> <span aria-hidden="true">/</span> MAGNETFELD</div>
+      <nav aria-label="Hauptnavigation">
+        <a href="#lernen">Üben</a><a href="#experiment">Bildschirmexperiment</a><a href="#ticket">Exit-Ticket</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inhalt">
+    <div class="hero">
+      <div class="eyebrow">Magnetismus · Klasse 5</div>
+      <h1>Unsichtbar –<br><span>aber nachweisbar.</span></h1>
+      <p>Untersuche, wie ein Magnet auf Abstand wirkt. Nutze Eisenfeilspäne als Modell und lege einen Kompass an verschiedene Stellen des Magnetfeldes.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#experiment">Experiment starten <span aria-hidden="true">↓</span></a>
+        <a class="btn" href="#lernen">Übungen öffnen</a>
+      </div>
+    </div>
+
+    <section id="experiment" aria-labelledby="experiment-title">
+      <div class="section-head">
+        <div><div class="eyebrow">Interaktives Modell</div><h2 id="experiment-title">Das Magnetfeld erkunden</h2>
+          <p>Schalte die Feldlinien ein. Streue danach Eisenfeilspäne ein oder setze den Kompass an eine beliebige Stelle.</p></div>
+        <span class="pill">Zieh den Kompass mit Maus oder Finger</span>
+      </div>
+      <div class="experiment-layout">
+        <div class="card">
+          <div class="lab-stage">
+            <svg id="fieldLab" viewBox="0 0 760 430" role="img" aria-label="Interaktives Magnetfeldmodell mit Stabmagnet und beweglichem Kompass">
+              <defs>
+                <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L9,4.5 L0,9 z" fill="#ff9b2f"></path>
+                </marker>
+                <radialGradient id="glow">
+                  <stop offset="0" stop-color="#ff8a00" stop-opacity=".16"></stop>
+                  <stop offset="1" stop-color="#ff8a00" stop-opacity="0"></stop>
+                </radialGradient>
+              </defs>
+              <rect x="0" y="0" width="760" height="430" rx="14" fill="#131313"></rect>
+              <circle cx="380" cy="215" r="190" fill="url(#glow)"></circle>
+              <g id="fieldPaths" aria-hidden="true">
+                <path class="path" d="M320 197 C230 174 230 76 380 76 C530 76 530 174 440 197"></path>
+                <path class="path" d="M320 202 C255 187 265 122 380 122 C495 122 505 187 440 202"></path>
+                <path class="path" d="M320 228 C255 243 265 308 380 308 C495 308 505 243 440 228"></path>
+                <path class="path" d="M320 233 C230 256 230 354 380 354 C530 354 530 256 440 233"></path>
+                <path class="path" d="M320 215 C290 215 282 215 270 215"></path>
+                <path class="path" d="M490 215 C478 215 470 215 440 215"></path>
+                <g id="filings"></g>
+              </g>
+              <g id="magnet" aria-label="Stabmagnet, Nordpol links und Südpol rechts">
+                <rect x="320" y="190" width="60" height="50" rx="6 0 0 6" class="magnet-left"></rect>
+                <rect x="380" y="190" width="60" height="50" rx="0 6 6 0" class="magnet-right"></rect>
+                <rect x="320" y="190" width="120" height="50" rx="6" fill="none" stroke="#f1f1f1" stroke-width="2"></rect>
+                <line x1="380" y1="191" x2="380" y2="239" stroke="#666" stroke-width="2"></line>
+                <text x="350" y="222" text-anchor="middle" class="pole-letter">N</text>
+                <text x="410" y="222" text-anchor="middle" class="pole-letter light">S</text>
+              </g>
+              <g id="compass" class="compass" transform="translate(540 215)" tabindex="0" role="slider" aria-label="Kompass, mit Maus oder Finger verschieben" aria-valuetext="rechts neben dem Magneten">
+                <circle class="compass-ring" r="22"></circle>
+                <g id="needle" transform="rotate(0)">
+                  <path class="needle-n" d="M0 -17 L6 0 L0 3 L-6 0 Z"></path>
+                  <path class="needle-s" d="M0 17 L6 0 L0 3 L-6 0 Z"></path>
+                  <circle class="needle-hub" r="3.5"></circle>
+                </g>
+                <text x="0" y="-27" text-anchor="middle" fill="#eee" font-size="11" font-weight="800">N</text>
+              </g>
+              <text x="22" y="27" class="stage-label">Feldlinien außen: N → S</text>
+              <text x="738" y="408" text-anchor="end" class="stage-label" id="fieldHint">Klicke ins Feld, um den Kompass zu platzieren.</text>
+            </svg>
+          </div>
+          <p class="mini-note">Das Bild ist ein Modell: Feldlinien sind keine echten Fäden. Die Kompassnadel zeigt an ihrem Ort die Feldrichtung.</p>
+        </div>
+        <div class="card controls" aria-label="Experimentsteuerung">
+          <button class="btn" id="toggleLines" type="button">Feldlinien zeigen</button>
+          <button class="btn" id="toggleFilings" type="button">Eisenfeilspäne einstreuen</button>
+          <button class="btn" id="resetCompass" type="button">Kompass zurücksetzen</button>
+          <div class="readout" aria-live="polite"><strong>Beobachtung</strong><br><span id="compassReadout">Setze den Kompass ins Feld. Beobachte, wie sich die Nadel dreht.</span></div>
+          <div class="readout"><strong>Vergleiche</strong><br>Was ändert sich, wenn der Kompass weiter vom Magneten entfernt liegt?</div>
+          <p class="mini-note">Tipp: Ziehe den Kompass direkt. Auf einem Tablet kannst du ihn mit dem Finger verschieben.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="lernen" aria-labelledby="lernen-title">
+      <div class="section-head">
+        <div><div class="eyebrow">Schritt für Schritt</div><h2 id="lernen-title">Übe in drei Stufen</h2>
+          <p>Arbeite dich von der Grundidee zur Deutung von Feldlinien vor. Eine Stufe wird freigeschaltet, wenn du alle Aufgaben der vorherigen Stufe richtig gelöst hast.</p></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="progressText">Stufe 1 ist geöffnet.</span><span id="progressCount">0 / 9 richtig</span></div>
+        <progress id="overallProgress" max="9" value="0" aria-label="Fortschritt durch die Übungen"></progress>
+      </div>
+      <div class="grid three" id="levelCards"></div>
+      <div class="card task-box" id="taskBox" aria-live="polite"></div>
+      <div class="task-controls" id="taskControls" hidden>
+        <button class="btn primary" id="nextTask" type="button">Weiter</button>
+      </div>
+    </section>
+
+    <section id="ticket" aria-labelledby="ticket-title">
+      <div class="section-head">
+        <div><div class="eyebrow">Zum Schluss</div><h2 id="ticket-title">Exit-Ticket</h2>
+          <p>Zeig kurz, was du verstanden hast. Das Ticket ist wiederholbar und wird ohne Namen bearbeitet.</p></div>
+      </div>
+      <div class="card">
+        <form id="exitForm">
+          <fieldset class="quiz-q">
+            <legend>1. Was zeigt eine Kompassnadel an? <span class="pill">1 Punkt</span></legend>
+            <div class="quiz-options">
+              <label><input type="radio" name="q1" value="a"> Die Richtung des Magnetfeldes an ihrem Ort.</label>
+              <label><input type="radio" name="q1" value="b"> Den Abstand zum Magneten.</label>
+              <label><input type="radio" name="q1" value="c"> Die Farbe des Magnetpols.</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-q">
+            <legend>2. Eisenfeilspäne werden im Feld zu kleinen magnetischen Nadeln und richten sich aus. <span class="pill">1 Punkt</span></legend>
+            <div class="quiz-options">
+              <label><input type="radio" name="q2" value="w"> Richtig</label>
+              <label><input type="radio" name="q2" value="f"> Falsch</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-q">
+            <legend>3. In welche Richtung zeigen Feldlinien außerhalb eines Stabmagneten? <span class="pill">1 Punkt</span></legend>
+            <div class="quiz-options">
+              <label><input type="radio" name="q3" value="a"> Vom Nordpol zum Südpol.</label>
+              <label><input type="radio" name="q3" value="b"> Vom Südpol zum Nordpol.</label>
+              <label><input type="radio" name="q3" value="c"> Immer zur Mitte des Magneten.</label>
+            </div>
+          </fieldset>
+          <div class="task-controls" style="margin-top:18px">
+            <button class="btn primary" type="submit">Antworten prüfen</button>
+            <button class="btn" type="reset" id="resetTicket">Neu bearbeiten</button>
+          </div>
+        </form>
+        <div class="result" id="ticketResult" aria-live="polite"></div>
+        <div class="task-controls" id="downloadControls" hidden>
+          <button class="btn" type="button" id="downloadResult">Anonymes Ergebnis herunterladen</button>
+        </div>
+        <p class="privacy"><strong>Datenschutz:</strong> Keine Anmeldung, kein Name, keine Übertragung an einen Server. Die Auswertung passiert nur in diesem Browser. Wenn du möchtest, kannst du den anonymen Ergebnistext herunterladen und deinem Lehrer geben.</p>
+      </div>
+    </section>
+  </main>
+  <footer>Magnetismus · Magnetfeld untersuchen · Diese Übungsseite funktioniert als einzelne HTML-Datei, auch ohne zusätzliche Bibliotheken.</footer>
+
+  <script>
+    (() => {
+      "use strict";
+      const svg = document.getElementById("fieldLab");
+      const compass = document.getElementById("compass");
+      const needle = document.getElementById("needle");
+      const readout = document.getElementById("compassReadout");
+      const hint = document.getElementById("fieldHint");
+      const filingGroup = document.getElementById("filings");
+      const pathGroup = document.getElementById("fieldPaths");
+      let compassPos = { x: 540, y: 215 };
+      let dragging = false;
+      let linesShown = false;
+      let filingsShown = false;
+
+      // Approximate bar-magnet field using two opposite magnetic poles.
+      function fieldAt(x, y) {
+        const poles = [{x: 320, y: 215, q: 1}, {x: 440, y: 215, q: -1}];
+        let bx = 0, by = 0;
+        for (const p of poles) {
+          const dx = x - p.x, dy = y - p.y;
+          const r2 = dx * dx + dy * dy;
+          const scale = p.q / Math.pow(Math.max(r2, 180), 1.5);
+          bx += dx * scale;
+          by += dy * scale;
+        }
+        return { bx, by };
+      }
+      function updateCompass(x, y) {
+        x = Math.max(28, Math.min(732, x));
+        y = Math.max(42, Math.min(388, y));
+        compassPos = {x, y};
+        const {bx, by} = fieldAt(x, y);
+        const deg = Math.atan2(by, bx) * 180 / Math.PI;
+        compass.setAttribute("transform", `translate(${x} ${y})`);
+        // The red needle points upward at 0 degrees in the SVG; rotate it
+        // by the field angle plus 90 degrees so its north tip follows B.
+        needle.setAttribute("transform", `rotate(${deg + 90})`);
+        const distance = Math.round(Math.hypot(x - 380, y - 215));
+        compass.setAttribute("aria-valuetext", `${distance} SVG-Einheiten vom Magnetmittelpunkt entfernt`);
+        let direction;
+        const angle = (Math.atan2(by, bx) * 180 / Math.PI + 360) % 360;
+        if (angle < 22.5 || angle >= 337.5) direction = "nach rechts";
+        else if (angle < 67.5) direction = "schräg nach rechts oben";
+        else if (angle < 112.5) direction = "nach oben";
+        else if (angle < 157.5) direction = "schräg nach links oben";
+        else if (angle < 202.5) direction = "nach links";
+        else if (angle < 247.5) direction = "schräg nach links unten";
+        else if (angle < 292.5) direction = "nach unten";
+        else direction = "schräg nach rechts unten";
+        readout.textContent = `Die rote Nordspitze zeigt ${direction}. Verschiebe den Kompass und vergleiche die Richtung.`;
+        hint.textContent = "Kompass gesetzt: beobachte die rote Nordspitze.";
+      }
+      function pointFromEvent(event) {
+        const pt = svg.createSVGPoint();
+        pt.x = event.clientX; pt.y = event.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      svg.addEventListener("pointerdown", (event) => {
+        const targetCompass = event.target.closest && event.target.closest("#compass");
+        const p = pointFromEvent(event);
+        if (targetCompass) {
+          dragging = true;
+          compass.classList.add("dragging");
+          compass.setPointerCapture(event.pointerId);
+          event.preventDefault();
+        } else {
+          updateCompass(p.x, p.y);
+        }
+      });
+      svg.addEventListener("pointermove", (event) => {
+        if (!dragging) return;
+        const p = pointFromEvent(event);
+        updateCompass(p.x, p.y);
+      });
+      svg.addEventListener("pointerup", () => { dragging = false; compass.classList.remove("dragging"); });
+      compass.addEventListener("keydown", (event) => {
+        const step = event.shiftKey ? 18 : 8;
+        let {x, y} = compassPos;
+        if (event.key === "ArrowLeft") x -= step;
+        else if (event.key === "ArrowRight") x += step;
+        else if (event.key === "ArrowUp") y -= step;
+        else if (event.key === "ArrowDown") y += step;
+        else return;
+        event.preventDefault(); updateCompass(x, y);
+      });
+      document.getElementById("toggleLines").addEventListener("click", (event) => {
+        linesShown = !linesShown;
+        pathGroup.querySelectorAll(".path").forEach(p => p.classList.toggle("hidden-lines", !linesShown));
+        event.currentTarget.textContent = linesShown ? "Feldlinien ausblenden" : "Feldlinien zeigen";
+      });
+      function createFilings() {
+        filingGroup.replaceChildren();
+        const paths = [...pathGroup.querySelectorAll(".path")].slice(0, 4);
+        paths.forEach((path, pi) => {
+          const total = path.getTotalLength();
+          const count = 30;
+          for (let i = 2; i < count - 1; i++) {
+            const pos = total * i / count;
+            const here = path.getPointAtLength(pos);
+            const after = path.getPointAtLength(Math.min(total, pos + 1));
+            const angle = Math.atan2(after.y - here.y, after.x - here.x) * 180 / Math.PI;
+            const jitter = Math.sin(i * 8.3 + pi * 17) * 3.5;
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", here.x - 3.5); line.setAttribute("x2", here.x + 3.5);
+            line.setAttribute("y1", here.y + jitter); line.setAttribute("y2", here.y + jitter);
+            line.setAttribute("transform", `rotate(${angle} ${here.x} ${here.y + jitter})`);
+            line.setAttribute("class", "file");
+            filingGroup.appendChild(line);
+          }
+        });
+      }
+      document.getElementById("toggleFilings").addEventListener("click", (event) => {
+        filingsShown = !filingsShown;
+        if (filingsShown && !filingGroup.childElementCount) createFilings();
+        filingGroup.querySelectorAll(".file").forEach(f => f.classList.toggle("visible", filingsShown));
+        event.currentTarget.textContent = filingsShown ? "Eisenfeilspäne entfernen" : "Eisenfeilspäne einstreuen";
+        if (filingsShown) readout.textContent = "Die Späne richten sich entlang des Feldes aus. Sie machen den Verlauf sichtbar, zeigen aber nicht die Feldlinien selbst.";
+      });
+      document.getElementById("resetCompass").addEventListener("click", () => updateCompass(540, 215));
+      updateCompass(540, 215);
+
+      const levels = [
+        {
+          title: "Grundlagen", stars: "★☆☆", desc: "Wirkung ohne Berührung und das Magnetfeld als Wirkungsbereich verstehen.", tasks: [
+            {q:"Ein Magnet zieht eine Büroklammer an, ohne sie zu berühren. Was zeigt das?", a:["Magnetkraft kann über Abstand wirken.","Die Büroklammer ist aus Holz.","Magnetkraft wirkt nur bei Berührung."], correct:0, why:"Das Magnetfeld reicht über den Magneten hinaus. Dort kann es auf passende Gegenstände wirken."},
+            {q:"Wie nennt man den Wirkungsbereich um einen Magneten?", a:["Magnetfeld","Magnetstreifen","Magnetkreis"], correct:0, why:"Der Wirkungsbereich eines Magneten heißt Magnetfeld."},
+            {q:"Was passiert meistens mit der Magnetkraft, wenn der Abstand größer wird?", a:["Sie wird schwächer.","Sie wird immer stärker.","Sie bleibt genau gleich."], correct:0, why:"Mit zunehmendem Abstand wird die magnetische Wirkung schwächer."}
+          ]
+        },
+        {
+          title: "Feld sichtbar machen", stars: "★★☆", desc: "Eisenfeilspäne und Kompass als Probekörper nutzen.", tasks: [
+            {q:"Warum richten sich Eisenfeilspäne im Magnetfeld aus?", a:["Sie werden zu kleinen magnetischen Nadeln.","Das Papier drückt sie in Linien.","Sie kleben aneinander wie eine Kette."], correct:0, why:"Unter dem Einfluss der Magnetkraft werden die Späne selbst zu kleinen magnetischen Nadeln."},
+            {q:"Was zeigt eine Kompassnadel an einer Stelle im Magnetfeld?", a:["Die Richtung der Magnetkraft dort.","Die Entfernung zum Magnetpol.","Die Größe des Magneten."], correct:0, why:"Die Nadel richtet sich nach der Feldrichtung an ihrem Ort aus."},
+            {q:"Welcher Stoff eignet sich, um ein Magnetfeld sichtbar zu machen?", a:["Eisenfeilspäne","Holzspäne","Papierschnipsel"], correct:0, why:"Eisen wird magnetisch beeinflusst; Holz und Papier richten sich nicht so im Feld aus."}
+          ]
+        },
+        {
+          title: "Feldlinien deuten", stars: "★★★", desc: "Feldlinien als Modell lesen und Zeichnungen beurteilen.", tasks: [
+            {q:"Welche Aussage zu Feldlinien ist richtig?", a:["Sie sind ein Modell für Verlauf und Richtung des Feldes.","Es sind echte Fäden um den Magneten.","Man kann sie ohne Hilfsmittel sehen."], correct:0, why:"Feldlinien sind gedachte Linien. Sie stellen die Richtung und den Verlauf des unsichtbaren Feldes dar."},
+            {q:"Wie ist die Richtung der Feldlinien außerhalb eines Stabmagneten festgelegt?", a:["Vom Nordpol zum Südpol.","Vom Südpol zum Nordpol.","Vom Magneten nach oben."], correct:0, why:"Außerhalb des Magneten verlaufen die Feldlinien vom Nordpol zum Südpol."},
+            {q:"Auf einer Zeichnung liegen Feldlinien nahe am Pol dichter als weiter weg. Was zeigt das?", a:["Dort ist das Feld stärker.","Dort ist das Feld unsichtbar.","Der Magnet hat dort keinen Pol."], correct:0, why:"Eine dichtere Darstellung steht im Feldlinienmodell für ein stärkeres Feld."}
+          ]
+        }
+      ];
+      const state = {unlocked:0, solved:[0,0,0], taskIndex:0, currentLevel:0, answered:false};
+      const levelCards = document.getElementById("levelCards");
+      const taskBox = document.getElementById("taskBox");
+      const taskControls = document.getElementById("taskControls");
+      const nextTask = document.getElementById("nextTask");
+      const progressText = document.getElementById("progressText");
+      const progressCount = document.getElementById("progressCount");
+      const overallProgress = document.getElementById("overallProgress");
+
+      function renderLevels() {
+        levelCards.replaceChildren();
+        levels.forEach((level, i) => {
+          const card = document.createElement("article");
+          card.className = "card level-card" + (i > state.unlocked ? " locked" : "") + (i === state.currentLevel && taskBox.classList.contains("open") ? " active" : "");
+          const h = document.createElement("div"); h.className = "stars"; h.textContent = level.stars;
+          const title = document.createElement("h3"); title.textContent = level.title;
+          const desc = document.createElement("p"); desc.textContent = level.desc;
+          const info = document.createElement("div"); info.className = "mini-note";
+          info.textContent = `${state.solved[i]} / 3 Aufgaben richtig`;
+          const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn";
+          btn.textContent = i > state.unlocked ? "🔒 Noch gesperrt" : (state.solved[i] === 3 ? "Erneut üben" : "Stufe öffnen");
+          btn.disabled = i > state.unlocked;
+          btn.addEventListener("click", () => openLevel(i));
+          card.append(h,title,desc,info,btn); levelCards.appendChild(card);
+        });
+        const total = state.solved.reduce((a,b)=>a+b,0);
+        overallProgress.value = total;
+        progressCount.textContent = `${total} / 9 richtig`;
+        progressText.textContent = state.unlocked === 2 && state.solved[2] === 3 ? "Alle drei Stufen geschafft - stark!" : `Stufe ${state.unlocked + 1} ist geöffnet.`;
+      }
+      function openLevel(i) {
+        if (i > state.unlocked) return;
+        state.currentLevel = i;
+        if (state.solved[i] === 3) state.solved[i] = 0;
+        state.taskIndex = state.solved[i];
+        taskBox.classList.add("open");
+        taskControls.hidden = true;
+        renderTask(); renderLevels();
+        taskBox.scrollIntoView({behavior:"smooth",block:"nearest"});
+      }
+      function renderTask() {
+        const level = levels[state.currentLevel];
+        const idx = state.taskIndex;
+        const task = level.tasks[idx];
+        state.answered = false;
+        taskBox.replaceChildren();
+        const label = document.createElement("div"); label.className = "task-title"; label.textContent = `${level.stars} · Aufgabe ${idx + 1} von 3`;
+        const q = document.createElement("div"); q.className = "question"; q.textContent = task.q;
+        const list = document.createElement("div"); list.className = "answers";
+        const feedback = document.createElement("div"); feedback.className = "feedback"; feedback.setAttribute("aria-live","polite");
+        task.a.forEach((answer, ai) => {
+          const b = document.createElement("button"); b.type = "button"; b.className = "answer-btn"; b.textContent = answer;
+          b.addEventListener("click", () => {
+            if (state.answered) return;
+            state.answered = true;
+            if (ai === task.correct) {
+              b.classList.add("correct"); feedback.className = "feedback good"; feedback.textContent = `Richtig! ${task.why}`;
+              if (state.solved[state.currentLevel] < idx + 1) state.solved[state.currentLevel] = idx + 1;
+              if (state.solved[state.currentLevel] === 3 && state.currentLevel < 2) state.unlocked = Math.max(state.unlocked, state.currentLevel + 1);
+            } else {
+              b.classList.add("incorrect"); feedback.className = "feedback bad"; feedback.textContent = `Noch nicht. ${task.why}`;
+            }
+            [...list.children].forEach((button, j) => { if (j === task.correct) button.classList.add("correct"); button.disabled = true; });
+            taskControls.hidden = false;
+            nextTask.textContent = state.solved[state.currentLevel] === 3 ? (state.currentLevel < 2 ? "Weiter zur nächsten Stufe" : "Fertig") : "Nächste Aufgabe";
+            renderLevels();
+          });
+          list.appendChild(b);
+        });
+        taskBox.append(label,q,list,feedback);
+        taskControls.hidden = true;
+      }
+      nextTask.addEventListener("click", () => {
+        const solved = state.solved[state.currentLevel];
+        if (solved < 3) state.taskIndex = solved;
+        else if (state.currentLevel < 2 && state.unlocked > state.currentLevel) state.currentLevel += 1, state.taskIndex = 0;
+        else { taskBox.classList.remove("open"); taskControls.hidden = true; renderLevels(); return; }
+        renderTask(); renderLevels();
+      });
+      renderLevels();
+
+      const correctAnswers = {q1:"a",q2:"w",q3:"a"};
+      let lastTicket = null;
+      const form = document.getElementById("exitForm");
+      const result = document.getElementById("ticketResult");
+      const downloadControls = document.getElementById("downloadControls");
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let score = 0;
+        const mistakes = [];
+        const advice = {
+          q1:"Wiederhole: Die Kompassnadel zeigt die Feldrichtung an ihrem Ort.",
+          q2:"Wiederhole: Eisenfeilspäne richten sich im Magnetfeld aus.",
+          q3:"Wiederhole die Richtung der Feldlinien außerhalb des Magneten: N nach S."
+        };
+        for (const [name, answer] of Object.entries(correctAnswers)) {
+          const selected = form.querySelector(`input[name="${name}"]:checked`);
+          if (selected && selected.value === answer) score++;
+          else mistakes.push(advice[name]);
+        }
+        lastTicket = {score, max:3, mistakes};
+        result.classList.add("show");
+        result.replaceChildren();
+        const heading = document.createElement("h3"); heading.textContent = `Dein Ergebnis: ${score} von 3 Punkten`;
+        const message = document.createElement("p"); message.textContent = score === 3 ? "Alles richtig - du kannst Magnetfelder sicher beschreiben." : score === 2 ? "Fast geschafft. Schau dir die Tipps an und bearbeite das Ticket noch einmal." : "Nutze die Tipps und probiere es noch einmal.";
+        result.append(heading,message);
+        if (mistakes.length) {
+          const ul = document.createElement("ul"); mistakes.forEach(t => {const li=document.createElement("li");li.textContent=t;ul.appendChild(li);}); result.appendChild(ul);
+        }
+        downloadControls.hidden = false;
+      });
+      document.getElementById("resetTicket").addEventListener("click", () => {
+        setTimeout(() => { result.classList.remove("show"); result.replaceChildren(); downloadControls.hidden = true; lastTicket = null; }, 0);
+      });
+      document.getElementById("downloadResult").addEventListener("click", () => {
+        if (!lastTicket) return;
+        const lines = ["Anonymes Exit-Ticket: Magnetfeld", `Punkte: ${lastTicket.score}/${lastTicket.max}`, `Fehlerschwerpunkte: ${lastTicket.mistakes.length ? lastTicket.mistakes.join(" | ") : "keine"}`];
+        const blob = new Blob([lines.join("\n")], {type:"text/plain;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href=url; a.download="exit-ticket-magnetfeld-anonym.txt"; a.click();
+        URL.revokeObjectURL(url);
+      });
+    })();
+  </script>
+</body>
+</html>
