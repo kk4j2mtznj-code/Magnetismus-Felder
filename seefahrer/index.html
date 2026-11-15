@@ -14,16 +14,31 @@
 .distance-control{width:210px;min-width:150px;padding:0 8px}.distance-control label{display:flex;align-items:center;justify-content:space-between;font-size:12px}.distance-control output{color:#ffcc8d;font-size:17px;font-weight:bold}.distance-control input[type=range]{display:block;width:100%;margin:0;min-height:32px;cursor:pointer}.distance-control input:disabled{cursor:default;opacity:.5}.distance-scale{display:flex;justify-content:space-between;padding:0 6px;font-size:11px;color:#e9e0ce;line-height:1.2}.distance-scale span{position:relative;text-align:center;min-width:9px}.distance-scale span:before{content:'';display:block;width:2px;height:5px;background:#cfb58a;margin:0 auto 3px}.helm{align-items:center}@media(max-width:1000px){.distance-control{width:175px;padding:0 3px}}@media(max-width:760px){.helm{flex-wrap:wrap;gap:8px;max-width:360px}.distance-control{width:100%;order:-1;padding:0 10px}.map-help{top:68px}.map-bottom{bottom:10px}}
 
 .open-tab-active>footer{display:none}#openDoorFrame{display:block;width:100%;height:calc(100dvh - 125px);min-height:760px;border:0;border-radius:16px;background:#11171b}#openDoorNotice{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;margin-bottom:14px;border:1px solid #8d744a;background:#252925;border-radius:12px}#openDoorHint{margin:5px 0 0;font-size:18px;font-weight:bold;max-width:1000px}.open-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.open-actions button{font-size:13px}.open-door>header,.open-door>footer,.open-door .intro,.open-door .side,.open-door .under{display:none!important}.open-door main{padding:12px;max-width:none}.open-door .layout{display:block}.open-door .map-wrap{width:100%;position:relative;top:0;height:calc(100dvh - 165px);min-height:570px}.open-door #openDoorNotice{display:flex}.open-door #stationPopup{max-width:570px}.open-door #stationPopupText{font-size:22px;line-height:1.6;margin-top:16px}@media(max-width:760px){#openDoorNotice{flex-direction:column;align-items:stretch}#openDoorHint{font-size:16px}.open-actions{justify-content:flex-start}.open-door .map-wrap{height:calc(100dvh - 200px);min-height:600px}#openDoorFrame{height:calc(100dvh - 160px);min-height:900px}}
+
+#openDoorFrame{height:calc(100dvh - 115px);min-height:545px}
+.open-tab-active main{max-width:none;padding-inline:clamp(4px,1vw,16px)}
+.open-door main{padding:0;max-width:none}
+.open-door #sea{min-height:100dvh;display:flex;flex-direction:column}
+.open-door #openDoorNotice{margin:0 0 8px;position:relative}
+.open-door .layout{display:flex;flex:1}
+.open-door .map-wrap{flex:1;align-self:stretch;height:auto;min-height:435px;border-radius:12px}
+.open-door .map-bottom,.open-door #helmRing,.open-door .map-help{display:none}
+.open-door #shipHandle{touch-action:none}
+#courseTip{position:absolute;z-index:4;transform:translate(-50%,-50%);width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;cursor:grab;touch-action:none}
+#courseTip:active{cursor:grabbing}
+.open-door .compass-overlay{width:135px}
+.open-door .compass-overlay .compass{width:100px;height:100px}
+@media(max-width:760px){.open-door #openDoorNotice{gap:8px;padding:10px 12px}.open-door .compass-overlay{width:104px}.open-door .compass-overlay .compass{width:72px;height:72px}}
 </style>
 </head><body>
 <header><div class="brand"><span class="logo" aria-hidden="true">✥</span><div><h1>Kurs Nord!</h1><div class="small">Rotbarts Schatzinsel · Physik 5</div></div></div><nav aria-label="Bereiche"><button id="navSea" aria-pressed="true">⛵ Auf See</button><button id="navLearn" aria-pressed="false">Kompass verstehen</button><button id="navExit" aria-pressed="false">Exit-Ticket</button><button id="navOpen" aria-pressed="false">Tag der offenen Tür</button></nav></header>
 <main>
 <section id="sea"><div class="intro"><div><div class="tag">Die geheime Route von Kapitän Rotbart</div><h2>Nur dein Kompass kennt den Weg.</h2><p>Richte dein Schiff auf der Karte aus. Fahre die angegebene Richtung und Strecke. Löse Rotbarts Magneträtsel für den nächsten Hinweis. Erst am Ende einer richtigen Route taucht eine Insel auf.</p></div><span class="badge" id="progress">0 von 4 Inseln entdeckt</span></div>
-<div id="openDoorNotice" hidden role="status" aria-live="polite"><div><div class="tag">Tag der offenen Tür · Piratenreise</div><p id="openDoorHint"></p></div><div class="open-actions"><button id="openDoorRetry" hidden>Fahrt erneut versuchen</button><button id="openDoorNext" hidden class="primary">Weg an der Station erhalten – weiterfahren</button><button id="openDoorReset">Neu starten</button></div></div><div class="layout"><div class="map-wrap" id="mapWrap">
+<div id="openDoorNotice" hidden role="status" aria-live="polite"><div><div class="tag">Tag der offenen Tür · Piratenreise</div><p id="openDoorHint"></p></div><div class="open-actions"><button id="openDoorRetry" hidden>Fahrt erneut versuchen</button><button id="openDoorNext" hidden class="primary">Weg an der Station erhalten – weiterfahren</button><button id="openDoorSail" class="primary" disabled>Leinen los</button><button id="openDoorReset">Neu starten</button></div></div><div class="layout"><div class="map-wrap" id="mapWrap">
 <canvas id="map" role="img" aria-label="Unbekanntes Meer. Inseln erscheinen erst nach einer korrekt gefahrenen Route."></canvas>
 <div class="compass-overlay"><div class="tag">Bordkompass · vergrößert</div><svg class="compass" id="compass" viewBox="0 0 200 200" role="img" aria-label="Vergrößerter Bordkompass"><circle cx="100" cy="100" r="96" fill="#111b20" stroke="#bc9968" stroke-width="3"/><g id="rose"></g><path d="M100 8 L94 23 L106 23Z" fill="#ffac59"/><g id="needle"><path d="M100 40 L89 100 L111 100Z" fill="#ff7c60"/><path d="M100 160 L89 100 L111 100Z" fill="#e8ecea"/></g><circle cx="100" cy="100" r="7" fill="#bd9b71"/></svg><div><strong id="dirRead">Nord</strong> · <span id="courseRead">000°</span></div><div class="small">Orange Marke = Bug<br>Rote Nadelspitze = Norden</div></div>
 <div class="map-top"><span></span><span class="map-label" id="weather">Unbekannte Gewässer</span></div>
-<div id="helmRing" aria-label="Schiff direkt auf der Karte ausrichten"></div>
+<button id="courseTip" hidden type="button"></button><div id="helmRing" aria-label="Schiff direkt auf der Karte ausrichten"></div>
 <button id="shipHandle" aria-label="Schiff drehen: ziehen oder mit den Pfeiltasten ausrichten" title="Zum Ausrichten am Schiff ziehen"></button>
 <div class="map-bottom"><div class="helm"><button id="left" aria-label="Schiff 45 Grad nach links drehen">↶ 45°</button><button id="right" aria-label="Schiff 45 Grad nach rechts drehen">45° ↷</button><div class="distance-control"><label for="distance">Fahrstrecke <output id="distanceRead" for="distance">1 sm</output></label><input id="distance" type="range" min="1" max="6" step="1" value="1" list="distanceTicks" aria-valuetext="1 Seemeile"><datalist id="distanceTicks"><option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option><option value="5"></option><option value="6"></option></datalist><div class="distance-scale" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div></div><button id="sail" class="primary">⛵ Losfahren</button></div></div>
 <div class="map-help">Am Schiff ziehen oder eine Richtung am Steuerring antippen.</div></div>
@@ -47,7 +62,7 @@ const routeSets={1:[[[0,4]],[[90,4]],[[0,3]],[[270,4]]],2:[[[0,3],[90,2]],[[90,3
 const islandNames=['Die Palmenbucht','Die Papageieninsel','Rotbarts Versteck','Die Schatzinsel'];
 const stories=['In einer Flasche steckt Rotbarts erste Nachricht: „Wer meinen Schatz finden will, muss zuerst den Kompass beherrschen. Folgt dieser Route!“','Unter einer Palme habt ihr die zweite Nachricht gefunden: „Gut gesteuert! Auf der nächsten Insel wartet mein alter Papagei auf euch.“','Der Papagei krächzt: „Immer Richtung UND Strecke beachten! In Rotbarts Versteck liegt das letzte Kartenstück.“','Im Versteck entdeckt ihr Rotbarts letzten Brief: „Jetzt kennt ihr das Geheimnis. Fahrt diese Route – und der Schatz gehört euch!“'];
 const islandInfos=['Zwischen Palmen liegt eine Flaschenpost. Der Kompass hat euch die Richtung gezeigt. Eure Streckenangabe hat euch bis hierher geführt.','Ein Papagei bewacht die nächste Nachricht. Er verrät: Die rote Nordspitze zeigt nicht zur Insel, sondern nach Norden.','Hier hatte Rotbart seinen Unterschlupf. Im Boden steckt der letzte Brief zur Schatzinsel.','Die Truhe ist voller Gold! Ihr habt Richtung, Entfernung und Reihenfolge richtig kombiniert.'];
-let level=1,stage=0,leg=0,ship={x:0,y:0,h:0},moving=false,done=false,failed=false,epoch=0,discovered=[],trail=[],islands=[],waypoints=[],legStart={x:0,y:0},travelled=0,lastResult=null,classResults=[],dragging=false;
+let level=1,stage=0,leg=0,ship={x:0,y:0,h:0},moving=false,done=false,failed=false,epoch=0,discovered=[],trail=[],islands=[],waypoints=[],legStart={x:0,y:0},travelled=0,lastResult=null,classResults=[];
 function view(id){document.body.classList.toggle('open-tab-active',id==='open');['sea','learn','exit','open'].forEach(x=>$('#'+x).hidden=x!==id);['Sea','Learn','Exit','Open'].forEach(x=>$('#nav'+x).setAttribute('aria-pressed',x.toLowerCase()===id));if(id==='sea')resize();if(id==='open'&&!$('#openDoorFrame').getAttribute('src'))$('#openDoorFrame').setAttribute('src','?modus=offene-tuer')}
 $('#navOpen').onclick=()=>view('open');
 $('#navSea').onclick=()=>view('sea');$('#navLearn').onclick=()=>view('learn');$('#navExit').onclick=()=>view('exit');
@@ -91,54 +106,164 @@ $('#magnetForm').onsubmit=e=>{e.preventDefault();const data=new FormData(e.targe
 
 const rose=$('#rose');let roseHTML='';for(let i=0;i<72;i++){const a=i*5*Math.PI/180,r=i%9===0?72:78;roseHTML+=`<line x1="${100+Math.sin(a)*r}" y1="${100-Math.cos(a)*r}" x2="${100+Math.sin(a)*84}" y2="${100-Math.cos(a)*84}" stroke="#bdc9c6"/>`}dirs.forEach((d,i)=>{const a=i*Math.PI/4;roseHTML+=`<text x="${100+Math.sin(a)*59}" y="${105-Math.cos(a)*59}" text-anchor="middle" fill="${i===0?'#ff997c':'#f5eddd'}" font-size="${i%2?12:16}" font-weight="bold">${d}</text>`});rose.innerHTML=roseHTML;
 dirs.forEach((d,i)=>{const b=document.createElement('button');b.className='steer';b.dataset.h=i*45;b.textContent=d;b.setAttribute('aria-label','Schiff nach '+dirNames[i]+' ausrichten');b.setAttribute('aria-pressed','false');b.onclick=()=>setHeading(i*45);$('#helmRing').append(b)});
-function setHeading(h){if(moving)return;ship.h=((Math.round(h/45)*45)%360+360)%360;$('#dirRead').textContent=dirNames[ship.h/45];$('#courseRead').textContent=String(ship.h).padStart(3,'0')+'°';$('#rose').setAttribute('transform',`rotate(${-ship.h} 100 100)`);$('#needle').setAttribute('transform',`rotate(${-ship.h} 100 100)`);$('#compass').setAttribute('aria-label',`Bordkompass: Bug nach ${dirNames[ship.h/45]}, ${ship.h} Grad. Die rote Nordspitze zeigt weiterhin nach Norden.`);$$('.steer').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.h===ship.h));$('#shipHandle').setAttribute('aria-label',`Schiff zeigt nach ${dirNames[ship.h/45]}. Ziehen oder mit den Pfeiltasten ausrichten.`);draw()}
+function setHeading(h){if(moving)return;ship.h=((Math.round(h/45)*45)%360+360)%360;$('#dirRead').textContent=dirNames[ship.h/45];$('#courseRead').textContent=String(ship.h).padStart(3,'0')+'°';$('#rose').setAttribute('transform',`rotate(${-ship.h} 100 100)`);$('#needle').setAttribute('transform',`rotate(${-ship.h} 100 100)`);$('#compass').setAttribute('aria-label',`Bordkompass: Bug nach ${dirNames[ship.h/45]}, ${ship.h} Grad. Die rote Nordspitze zeigt weiterhin nach Norden.`);$$('.steer').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.h===ship.h));$('#shipHandle').setAttribute('aria-label',openDoorMode?'Kurspfeil vom Schiff aus ziehen oder mit den Pfeiltasten setzen.':`Schiff zeigt nach ${dirNames[ship.h/45]}. Ziehen oder mit den Pfeiltasten ausrichten.`);draw()}
 $('#left').onclick=()=>setHeading(ship.h-45);$('#right').onclick=()=>setHeading(ship.h+45);
 $('#tryEast').onclick=()=>{view('sea');setHeading(90);$('#sailStatus').textContent='Auf der Karte zeigt die rote Nadel nach oben. Im vergrößerten Bordkompass liegt Norden links vom Bug.'};
 function buildWorld(){let x=0,y=0;islands=[{x:0,y:0,name:'Piratenhafen',r:.65,info:'Euer Startpunkt. Die unbekannten Inseln sind noch nicht auf eurer Karte eingetragen.'}];waypoints=[];for(let s=0;s<4;s++){const points=[];for(const [h,d] of routeSets[level][s]){x+=Math.sin(h*Math.PI/180)*d;y+=Math.cos(h*Math.PI/180)*d;points.push({x,y})}waypoints.push(points);islands.push({x,y,name:islandNames[s],r:s===3?.85:.7,info:islandInfos[s]})}}
 function syncDistance(){const n=Number($('#distance').value);$('#distanceRead').textContent=n+' sm';$('#distance').setAttribute('aria-valuetext',n+(n===1?' Seemeile':' Seemeilen'))}
 $('#distance').addEventListener('input',syncDistance);
-function restart(){if(openDoorMode){level=1;if($('#stationPopup').open)$('#stationPopup').close()}quizDeck=makeQuizDeck();quizSolved=[false,false,false,false];epoch++;moving=false;failed=false;done=false;stage=0;leg=0;travelled=0;ship={x:0,y:0,h:0};trail=[{x:0,y:0}];discovered=[0];legStart={x:0,y:0};buildWorld();$('#distance').value='1';syncDistance();$('#log').innerHTML='';$('#sailStatus').textContent='Lies die Flaschenpost und drehe dein Schiff am Steuerring.';$('#levelInfo').textContent=level===1?'Schiffsjunge · Eine Himmelsrichtung und eine Strecke pro Insel.':level===2?'Steuermann · Zwei Schritte je Route. Die Insel erscheint erst nach Schritt 2.':'Kapitän · Drei bis vier Schritte, auch nach Nordwest. Halte die Reihenfolge ein.';mission();setHeading(0);resize()}
+function restart(){if(openDoorMode){plannedDistance=0;level=1;if($('#stationPopup').open)$('#stationPopup').close()}quizDeck=makeQuizDeck();quizSolved=[false,false,false,false];epoch++;moving=false;failed=false;done=false;stage=0;leg=0;travelled=0;ship={x:0,y:0,h:0};trail=[{x:0,y:0}];discovered=[0];legStart={x:0,y:0};buildWorld();$('#distance').value='1';syncDistance();$('#log').innerHTML='';$('#sailStatus').textContent='Lies die Flaschenpost und drehe dein Schiff am Steuerring.';$('#levelInfo').textContent=level===1?'Schiffsjunge · Eine Himmelsrichtung und eine Strecke pro Insel.':level===2?'Steuermann · Zwei Schritte je Route. Die Insel erscheint erst nach Schritt 2.':'Kapitän · Drei bis vier Schritte, auch nach Nordwest. Halte die Reihenfolge ein.';mission();setHeading(0);resize()}
 function renderRoute(){const routes=routeSets[level][stage];$('#route').innerHTML='';if(clueOpen())routes.forEach(([h,d],i)=>{const li=document.createElement('li');li.textContent=`${d} sm nach ${dirNames[h/45]}`;li.className=i<leg||done?'complete':i===leg?'current'+(failed?' failed':''):'';if(i===leg&&!done)li.setAttribute('aria-current','step');$('#route').append(li)});$('#route').hidden=!clueOpen();$('#legCount').hidden=!clueOpen();$('#legCount').textContent=done?'Alle Navigationsschritte geschafft.':`Schritt ${leg+1} von ${routes.length} · erst ausrichten, dann Strecke wählen.`;$('#sail').disabled=moving||failed||done||!clueOpen();$('#distance').disabled=moving||failed||done||!clueOpen();$('#retry').hidden=!failed;$('#next').hidden=!done;$('#next').textContent=stage===3?'Schatz gefunden! Zum Exit-Ticket →':'Nächstes Magneträtsel →';$('#progress').textContent=`${discovered.length-1} von 4 Inseln entdeckt`;$('#weather').textContent=done&&stage===3?'Schatz gehoben!':`${discovered.length-1} / 4 Inseln entdeckt`;$('#position').textContent=`Im Logbuch: ${travelled} sm gefahren`;$$('.steer').forEach(b=>b.disabled=moving);$('#left').disabled=moving;$('#right').disabled=moving;if(openDoorMode)renderOpenDoor();}
 function mission(){done=false;failed=false;$('#missionCount').textContent=`KARTENSTÜCK ${stage+1} / 4`;$('#missionTitle').textContent=stage===3?'Die letzte Nachricht':'Flaschenpost '+(stage+1);$('#missionText').textContent=stories[stage];$('#missionFeedback').textContent='';$('#missionFeedback').className='feedback';$('#hint').hidden=true;$('#hint').textContent='Norden = oben, Osten = rechts, Süden = unten, Westen = links. Die Schiffsspitze muss in die geforderte Richtung zeigen. Nordwest liegt zwischen Nord und West. Ein Schritt wird immer mit einer Fahrt abgeschlossen.';legStart={x:ship.x,y:ship.y};renderGate();renderRoute();draw()}
 $$('[data-level]').forEach(b=>b.onclick=()=>{level=+b.dataset.level;$$('[data-level]').forEach(x=>x.setAttribute('aria-pressed',x===b));restart()});$('#restart').onclick=restart;$('#hintBtn').onclick=()=>{$('#hint').hidden=!$('#hint').hidden};
 $('#next').onclick=()=>{if(!done)return;if(stage===3){view('exit');return}stage++;leg=0;mission();$('#sailStatus').textContent='Eine versiegelte Flaschenpost! Löse das Magneträtsel, um die neue Route zu öffnen.'};
 $('#retry').onclick=()=>{if(!failed)return;ship.x=legStart.x;ship.y=legStart.y;trail.push({x:ship.x,y:ship.y,break:true});failed=false;$('#missionFeedback').textContent='Du bist am Start dieses Schrittes. Prüfe Richtung und Strecke und versuche es noch einmal.';$('#missionFeedback').className='feedback';$('#sailStatus').textContent='Dieser Schritt startet erneut. Bereits richtige Schritte bleiben erhalten.';renderRoute();draw()};
-function sail(){if(moving||done||failed||!clueOpen())return;const d=+$('#distance').value,h=ship.h,a=h*Math.PI/180,start={x:ship.x,y:ship.y},target={x:ship.x+Math.sin(a)*d,y:ship.y+Math.cos(a)*d},expected=routeSets[level][stage][leg],correct=h===expected[0]&&d===expected[1];moving=true;$('#sailStatus').textContent=`Du fährst ${d} sm nach ${dirNames[h/45]} …`;renderRoute();const id=epoch,t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:900+d*160;
+function sail(){if(moving||done||failed||!clueOpen())return;const d=openDoorMode?plannedDistance:Number($('#distance').value);if(d<=0)return;if(openDoorMode)plannedDistance=0;const h=ship.h,a=h*Math.PI/180,start={x:ship.x,y:ship.y},target={x:ship.x+Math.sin(a)*d,y:ship.y+Math.cos(a)*d},expected=routeSets[level][stage][leg],correct=h===expected[0]&&d===expected[1];moving=true;$('#sailStatus').textContent=`Du fährst ${d} sm nach ${dirNames[h/45]} …`;renderRoute();const id=epoch,t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:900+d*160;
 function frame(now){if(id!==epoch)return;const t=Math.min(1,(now-t0)/duration);ship.x=start.x+(target.x-start.x)*t;ship.y=start.y+(target.y-start.y)*t;draw();if(t<1)requestAnimationFrame(frame);else{moving=false;travelled+=d;trail.push({x:ship.x,y:ship.y});const entry=document.createElement('li');entry.textContent=`${correct?'✓':'↻'} ${d} sm ${dirNames[h/45]} · Route ${stage+1}, Schritt ${leg+1}`;$('#log').prepend(entry);const f=$('#missionFeedback');if(correct){leg++;legStart={x:ship.x,y:ship.y};f.className='feedback';if(leg===routeSets[level][stage].length){done=true;discovered.push(stage+1);if(openDoorMode)openDoorArrival(stage+1);f.textContent=stage===3?'Schatz gefunden! Eure Crew hat alle vier Inseln entdeckt. Rotbarts Gold gehört euch!':`Land in Sicht! ${islands[stage+1].name} ist entdeckt. Hier wartet ein Magneträtsel für den nächsten Hinweis.`;$('#sailStatus').textContent=stage===3?'Die Schatztruhe ist offen. Ihr habt Rotbarts Route gemeistert!':'Die Insel ist jetzt auf deiner Karte sichtbar.';$('#captain').textContent=stage===3?'Eine Truhe voller Gold!':'Land in Sicht!'}else{f.textContent=`Schritt ${leg} geschafft. Noch keine Insel: Fahre jetzt Schritt ${leg+1}.`;$('#sailStatus').textContent='Zwischenstopp auf offenem Meer. Lies den nächsten Schritt.'}}else{failed=true;f.className='feedback error';f.textContent=`Noch nicht auf Rotbarts Route. Du bist ${d} sm nach ${dirNames[h/45]} gefahren. Gefordert waren ${expected[1]} sm nach ${dirNames[expected[0]/45]}.`;$('#sailStatus').textContent='Es erscheint keine Insel. Kehre zum Start dieses Schrittes zurück.'}renderRoute();draw()}}requestAnimationFrame(frame)}
 $('#sail').onclick=sail;
-$('#shipHandle').addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();setHeading(ship.h+(e.key==='ArrowLeft'?-45:45))}if(e.code==='Space'||e.key==='Enter'){e.preventDefault();sail()}});
-const dragHandle=$('#shipHandle');function aim(e){const r=canvas.getBoundingClientRect(),p=project(ship.x,ship.y),dx=e.clientX-r.left-p.x,dy=e.clientY-r.top-p.y;if(Math.hypot(dx,dy)>12)setHeading(Math.atan2(dx,-dy)*180/Math.PI)}
-dragHandle.addEventListener('pointerdown',e=>{if(moving)return;dragging=true;dragHandle.setPointerCapture(e.pointerId);e.preventDefault()});dragHandle.addEventListener('pointermove',e=>{if(dragging)aim(e)});dragHandle.addEventListener('pointerup',e=>{if(!dragging)return;aim(e);dragging=false});dragHandle.addEventListener('pointercancel',()=>dragging=false);
+$('#shipHandle').addEventListener('keydown',e=>{if(openDoorMode){adjustCourseByKey(e);return}if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();setHeading(ship.h+(e.key==='ArrowLeft'?-45:45))}if(e.code==='Space'||e.key==='Enter'){e.preventDefault();sail()}});
+const dragHandle=$('#shipHandle');function aim(e){const r=canvas.getBoundingClientRect(),p=project(ship.x,ship.y),dx=e.clientX-r.left-p.x,dy=e.clientY-r.top-p.y;if(openDoorMode){
+    const horizontal=Math.abs(dx)>Math.abs(dy);
+    const heading=horizontal?(dx>0?90:270):(dy<0?0:180);
+    setPlannedCourse(heading,Math.max(Math.abs(dx),Math.abs(dy))/p.s);
+    return;
+  }
+  if(Math.hypot(dx,dy)>12)setHeading(Math.atan2(dx,-dy)*180/Math.PI)}
+function bindCourseDrag(handle){
+  let pointer=null, moved=false, startX=0, startY=0;
+  handle.addEventListener('pointerdown',e=>{
+    if(!e.isPrimary||e.button!==0||moving||(openDoorMode&&(done||failed)))return;
+    pointer=e.pointerId;
+    moved=false;
+    startX=e.clientX;
+    startY=e.clientY;
+    handle.setPointerCapture(pointer);
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pointer)return;
+    moved ||= Math.hypot(e.clientX-startX,e.clientY-startY)>4;
+    if(moved)aim(e);
+  });
+  handle.addEventListener('pointerup',e=>{
+    if(e.pointerId!==pointer)return;
+    if(moved)aim(e);
+    pointer=null;
+  });
+  handle.addEventListener('lostpointercapture',()=>{pointer=null});
+}
+bindCourseDrag(dragHandle);
+let plannedDistance=0;
+const courseTip=$('#courseTip');
+if(openDoorMode){
+  dragHandle.title='Hier ziehen, um den Kurspfeil zu setzen';
+  bindCourseDrag(courseTip);
+  courseTip.addEventListener('keydown',adjustCourseByKey);
+}
+function setPlannedCourse(heading,distance){
+  if(moving||done||failed)return;
+  plannedDistance=Math.min(6,Math.round(distance*2)/2);
+  setHeading(plannedDistance?heading:ship.h);
+  $('#openDoorSail').disabled=plannedDistance===0;
+}
+function adjustCourseByKey(event){
+  const heading={ArrowUp:0,ArrowRight:90,ArrowDown:180,ArrowLeft:270}[event.key];
+  if(heading===undefined)return;
+  event.preventDefault();
+  const delta=(heading-ship.h+360)%360;
+  setPlannedCourse(delta===180?ship.h:heading,delta===0?plannedDistance+0.5:delta===180?Math.max(0,plannedDistance-0.5):Math.max(0.5,plannedDistance));
+}
+function drawCourse(origin){
+  courseTip.hidden=!plannedDistance||moving||done||failed;
+  if(courseTip.hidden)return;
+  const angle=ship.h*Math.PI/180;
+  const tip=project(ship.x+Math.sin(angle)*plannedDistance,ship.y+Math.cos(angle)*plannedDistance);
+  courseTip.style.left=tip.x+'px';
+  courseTip.style.top=tip.y+'px';
+  const label=plannedDistance.toLocaleString('de-DE')+' sm';
+  courseTip.setAttribute('aria-label',label+' nach '+dirNames[ship.h/45]+'. Pfeilspitze ziehen oder Pfeiltasten verwenden.');
+  ctx.save();
+  ctx.strokeStyle='#ffd38f';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(origin.x,origin.y);
+  ctx.lineTo(tip.x,tip.y);
+  ctx.stroke();
+  ctx.translate(tip.x,tip.y);
+  ctx.rotate(angle);
+  ctx.fillStyle='#ffd38f';
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(-8,13);
+  ctx.lineTo(8,13);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.font='bold 16px Arial';
+  ctx.textAlign='center';
+  const halfWidth=ctx.measureText(label).width/2+9;
+  const x=Math.max(halfWidth+4,Math.min(W-halfWidth-4,(origin.x+tip.x)/2+(ship.h%180===0?43:0)));
+  const y=Math.max(26,Math.min(H-10,(origin.y+tip.y)/2-(ship.h%180===0?0:20)));
+  ctx.fillStyle='#14232b';
+  ctx.fillRect(x-halfWidth,y-18,halfWidth*2,25);
+  ctx.fillStyle='#ffd38f';
+  ctx.fillText(label,x,y);
+  ctx.restore();
+}
 const stationInstruction='Gehe jetzt zu der Insel und löse dort das Rätsel. Dort erhältst du den Weg zur nächsten Insel!';
 const treasureInstruction='Du kannst den Schatz jetzt heben!';
 function renderOpenDoor(){
 $('#openDoorNotice').hidden=false;
-$('#openDoorHint').textContent=done?(stage===3?treasureInstruction:stationInstruction):failed?'Dieser Weg passt noch nicht. Prüfe Richtung und Entfernung auf deinem Stationshinweis und versuche die Fahrt erneut.':moving?'Dein Schiff ist unterwegs …':stage===0?'Starte am Piratenhafen: Fahre 4 sm nach Norden.':'Nutze den Weg, den du an der Station erhalten hast. Richte das Schiff aus, wähle die Strecke und fahre los.';
+$('#openDoorHint').textContent=done?(stage===3?treasureInstruction:stationInstruction):failed?'Dieser Weg passt noch nicht. Prüfe Richtung und Entfernung auf deinem Stationshinweis und versuche die Fahrt erneut.':moving?'Dein Schiff ist unterwegs …':stage===0?'Fahre 4 sm nach Norden. Ziehe den Pfeil vom Schiff aus und drücke „Leinen los“.':'Ziehe den Pfeil für den Kurs von deiner Station. Drücke dann „Leinen los“.';
+$('#openDoorSail').hidden=done||failed;$('#openDoorSail').disabled=moving||done||failed||!plannedDistance;
 $('#openDoorNext').hidden=!done||stage===3;$('#openDoorRetry').hidden=!failed;
 $('#weather').textContent=done&&stage===3?'Schatzinsel erreicht!':`${discovered.length-1} / 4 Inseln erreicht`;
 }
 function openDoorArrival(i){$('#stationPopupTitle').textContent=islands[i].name;$('#stationPopupText').textContent=i===4?treasureInstruction:stationInstruction;$('#stationPopup').showModal()}
 $('#stationPopupClose').onclick=()=>$('#stationPopup').close();
 $('#openDoorReset').onclick=restart;
+$('#openDoorSail').onclick=sail;
 $('#openDoorRetry').onclick=()=>$('#retry').onclick();
 $('#openDoorNext').onclick=()=>{if(!done||stage===3)return;stage++;leg=0;mission()};
-function project(x,y){const scale=Math.min(W/19,(H-145)/18);return{x:W/2+(x-3)*scale,y:H/2+30-(y-5)*scale,s:scale}}
+function project(x,y){
+  if(openDoorMode){
+    const scale=Math.min((W-12)/17,(H-12)/20);
+    return {x:W/2+(x-2)*scale,y:H/2-(y-3.5)*scale,s:scale};
+  }
+  const scale=Math.min(W/19,(H-145)/18);return{x:W/2+(x-3)*scale,y:H/2+30-(y-5)*scale,s:scale}}
 function resize(){const r=$('#mapWrap').getBoundingClientRect();if(!r.width)return;W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw()}new ResizeObserver(resize).observe($('#mapWrap'));
 function islandDraw(is,i){const p=project(is.x,is.y),r=Math.max(21,is.r*p.s);ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='#16344070';ctx.beginPath();ctx.ellipse(4,10,r*1.65,r*.95,-.13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#b5d6d24a';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,2,r*1.85,r*1.1,-.13,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d0bb89';ctx.beginPath();ctx.ellipse(0,0,r*1.55,r*.9,-.15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#758461';ctx.beginPath();ctx.ellipse(-2,-4,r*1.25,r*.67,-.15,0,Math.PI*2);ctx.fill();
 for(let n=0;n<3;n++){const x=(n-1)*r*.65,y=n%2*8-5;ctx.strokeStyle='#805d3e';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y+5);ctx.quadraticCurveTo(x+5,y-15,x+2,y-30);ctx.stroke();ctx.strokeStyle='#315a48';ctx.lineWidth=5;for(let f=-2;f<=2;f++){ctx.beginPath();ctx.moveTo(x+2,y-29);ctx.quadraticCurveTo(x+f*7,y-36,x+f*12,y-20);ctx.stroke()}}
 if(i===0){ctx.fillStyle='#d9c3a0';ctx.fillRect(-11,-11,23,19);ctx.fillStyle='#6c4538';ctx.beginPath();ctx.moveTo(-15,-11);ctx.lineTo(0,-25);ctx.lineTo(15,-11);ctx.fill();ctx.fillStyle='#754d2c';ctx.fillRect(9,7,28,7)}else if(i===4){ctx.fillStyle='#774522';ctx.fillRect(-16,-5,32,20);ctx.fillStyle='#dfb450';ctx.fillRect(-16,1,32,4);ctx.fillRect(-4,-5,7,20);ctx.fillStyle='#f7dd7b';for(let n=0;n<8;n++){ctx.beginPath();ctx.arc(-11+n*3,-10-(n%3)*3,3,0,Math.PI*2);ctx.fill()}ctx.strokeStyle='#ffdb7d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-27,-15);ctx.lineTo(-21,-9);ctx.moveTo(-21,-15);ctx.lineTo(-27,-9);ctx.stroke()}else{ctx.fillStyle='#e9d6a4';ctx.save();ctx.rotate(.25);ctx.fillRect(-8,-5,18,12);ctx.strokeStyle='#8d613b';ctx.lineWidth=1;ctx.strokeRect(-8,-5,18,12);ctx.restore()}
 ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.strokeStyle='#1b3a43';ctx.lineWidth=4;ctx.strokeText(is.name,0,r+24);ctx.fillStyle='#fff0ce';ctx.fillText(is.name,0,r+24);ctx.restore()}
-function draw(){if(!ctx)return;ctx.clearRect(0,0,W,H);const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#426f78');g.addColorStop(.6,'#284e5d');g.addColorStop(1,'#193b4b');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.strokeStyle='#cee0db10';ctx.lineWidth=1;for(let x=-10;x<20;x+=2){const p=project(x,0);ctx.beginPath();ctx.moveTo(p.x,0);ctx.lineTo(p.x,H);ctx.stroke()}for(let y=-10;y<25;y+=2){const p=project(0,y);ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(W,p.y);ctx.stroke()}
+function draw(){if(!ctx)return;ctx.clearRect(0,0,W,H);const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#426f78');g.addColorStop(.6,'#284e5d');g.addColorStop(1,'#193b4b');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);if(openDoorMode){
+  const origin=project(0,0),spacing=origin.s/2;
+  if(spacing>0){
+    ctx.lineWidth=1;
+    for(let i=Math.ceil(-origin.x/spacing);origin.x+i*spacing<W;i++){
+      const x=Math.round(origin.x+i*spacing)+0.5;
+      ctx.strokeStyle=i%2===0?'#cee0db32':'#cee0db18';
+      ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+    }
+    for(let i=Math.ceil(-origin.y/spacing);origin.y+i*spacing<H;i++){
+      const y=Math.round(origin.y+i*spacing)+0.5;
+      ctx.strokeStyle=i%2===0?'#cee0db32':'#cee0db18';
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+  }
+}else{ctx.strokeStyle='#cee0db10';ctx.lineWidth=1;for(let x=-10;x<20;x+=2){const p=project(x,0);ctx.beginPath();ctx.moveTo(p.x,0);ctx.lineTo(p.x,H);ctx.stroke()}for(let y=-10;y<25;y+=2){const p=project(0,y);ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(W,p.y);ctx.stroke()}}
 ctx.strokeStyle='#d1e5df25';for(let i=0;i<65;i++){const x=(i*139+29)%W,y=(i*79+30)%H;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+5,y+4,x+11,y);ctx.quadraticCurveTo(x+16,y-4,x+22,y);ctx.stroke()}
 ctx.fillStyle='#d0d9cf15';ctx.font='italic 22px Georgia';ctx.textAlign='center';ctx.fillText('Unbekannte Gewässer',W*.60,H*.24);
 for(const i of discovered)islandDraw(islands[i],i);
 ctx.strokeStyle='#ffe1aa90';ctx.lineWidth=2;ctx.setLineDash([3,6]);ctx.beginPath();trail.forEach((pt,i)=>{const q=project(pt.x,pt.y);if(!i||pt.break)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)});const p=project(ship.x,ship.y);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.setLineDash([]);
-ctx.save();ctx.translate(p.x,p.y);ctx.strokeStyle='#d3d5b93f';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,68,0,Math.PI*2);ctx.stroke();ctx.rotate(ship.h*Math.PI/180);ctx.fillStyle='#ffd495';ctx.beginPath();ctx.moveTo(0,-54);ctx.lineTo(-5,-43);ctx.lineTo(5,-43);ctx.fill();ctx.fillStyle='#102d3b66';ctx.beginPath();ctx.ellipse(5,8,20,34,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#754b2b';ctx.strokeStyle='#e2ba7d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-35);ctx.bezierCurveTo(20,-18,20,18,10,34);ctx.lineTo(-10,34);ctx.bezierCurveTo(-20,18,-20,-18,0,-35);ctx.fill();ctx.stroke();ctx.fillStyle='#b18b55';ctx.beginPath();ctx.ellipse(0,0,10,23,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f4dfb1';ctx.beginPath();ctx.moveTo(0,-23);ctx.lineTo(0,8);ctx.quadraticCurveTo(28,2,0,-23);ctx.fill();ctx.fillStyle='#17252a';ctx.fillRect(-1,-29,2,38);ctx.fillRect(0,-29,16,9);ctx.fillStyle='#f5e9ce';ctx.font='9px Arial';ctx.fillText('☠',7,-21);
+ctx.save();ctx.translate(p.x,p.y);ctx.strokeStyle='#d3d5b93f';ctx.lineWidth=1;ctx.beginPath();if(!openDoorMode){ctx.arc(0,0,68,0,Math.PI*2);ctx.stroke();}ctx.rotate(ship.h*Math.PI/180);ctx.fillStyle='#ffd495';ctx.beginPath();if(!openDoorMode){ctx.moveTo(0,-54);ctx.lineTo(-5,-43);ctx.lineTo(5,-43);ctx.fill();}ctx.fillStyle='#102d3b66';ctx.beginPath();ctx.ellipse(5,8,20,34,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#754b2b';ctx.strokeStyle='#e2ba7d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-35);ctx.bezierCurveTo(20,-18,20,18,10,34);ctx.lineTo(-10,34);ctx.bezierCurveTo(-20,18,-20,-18,0,-35);ctx.fill();ctx.stroke();ctx.fillStyle='#b18b55';ctx.beginPath();ctx.ellipse(0,0,10,23,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f4dfb1';ctx.beginPath();ctx.moveTo(0,-23);ctx.lineTo(0,8);ctx.quadraticCurveTo(28,2,0,-23);ctx.fill();ctx.fillStyle='#17252a';ctx.fillRect(-1,-29,2,38);ctx.fillRect(0,-29,16,9);ctx.fillStyle='#f5e9ce';ctx.font='9px Arial';ctx.fillText('☠',7,-21);
 // The tiny compass is fixed to the deck; its magnetic needle stays north on the chart.
 ctx.translate(0,20);ctx.fillStyle='#142229';ctx.strokeStyle='#f6d697';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,11,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#ffb561';ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(-2,-6);ctx.lineTo(2,-6);ctx.fill();ctx.rotate(-ship.h*Math.PI/180);ctx.fillStyle='#ff775e';ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(-3,0);ctx.lineTo(3,0);ctx.fill();ctx.fillStyle='#f4f0df';ctx.beginPath();ctx.moveTo(0,9);ctx.lineTo(-3,0);ctx.lineTo(3,0);ctx.fill();ctx.restore();
 ctx.save();ctx.translate(W-35,90);ctx.fillStyle='#fff0c7';ctx.strokeStyle='#d2d6bc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,13);ctx.lineTo(0,-23);ctx.stroke();ctx.beginPath();ctx.moveTo(0,-28);ctx.lineTo(-5,-16);ctx.lineTo(5,-16);ctx.fill();ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('N',0,-36);ctx.restore();
 const sc=project(0,0).s;ctx.strokeStyle='#e9debb';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(20,H-150);ctx.lineTo(20+sc*2,H-150);ctx.moveTo(20,H-155);ctx.lineTo(20,H-145);ctx.moveTo(20+sc*2,H-155);ctx.lineTo(20+sc*2,H-145);ctx.stroke();ctx.fillStyle='#f3e8cb';ctx.font='11px Arial';ctx.textAlign='left';ctx.fillText('2 sm',20,H-160);
 $$('.steer').forEach((b,i)=>{const a=i*Math.PI/4;b.style.left=p.x+Math.sin(a)*69+'px';b.style.top=p.y-Math.cos(a)*69+'px'});dragHandle.style.left=p.x+'px';dragHandle.style.top=p.y+'px';dragHandle.style.rotate=ship.h+'deg';
+if(openDoorMode)drawCourse(p);
 canvas.setAttribute('aria-label',`Seekarte. Schiff nach ${dirNames[ship.h/45]}. Sichtbar: ${discovered.map(i=>islands[i].name).join(', ')}. ${discovered.length-1} von 4 Inseln entdeckt.`);
 }
 canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;for(const i of discovered){const p=project(islands[i].x,islands[i].y);if(Math.hypot(x-p.x,y-p.y)<Math.max(30,islands[i].r*p.s*1.6)){if(openDoorMode){if(i>0)openDoorArrival(i);return}$('#islandTitle').textContent=islands[i].name;$('#islandText').textContent=islands[i].info;$('#islandDialog').showModal();break}}});$('#closeIsland').onclick=()=>$('#islandDialog').close();
