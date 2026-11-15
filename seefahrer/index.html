@@ -23,7 +23,10 @@
 .open-door .layout{display:flex;flex:1}
 .open-door .map-wrap{flex:1;align-self:stretch;height:auto;min-height:435px;border-radius:12px}
 .open-door .map-bottom,.open-door #helmRing,.open-door .map-help{display:none}
-.open-door #shipHandle{touch-action:none}
+.open-door #map{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.open-door #map:active{cursor:grabbing}
+.open-door #shipHandle,.open-door #courseTip{pointer-events:none}
+.open-door .map-wrap{touch-action:none}
 #courseTip{position:absolute;z-index:4;transform:translate(-50%,-50%);width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;cursor:grab;touch-action:none}
 #courseTip:active{cursor:grabbing}
 .open-door .compass-overlay{width:135px}
@@ -152,13 +155,78 @@ function bindCourseDrag(handle){
   });
   handle.addEventListener('lostpointercapture',()=>{pointer=null});
 }
-bindCourseDrag(dragHandle);
 let plannedDistance=0;
+let courseDragged=false;
 const courseTip=$('#courseTip');
 if(openDoorMode){
   dragHandle.title='Hier ziehen, um den Kurspfeil zu setzen';
-  bindCourseDrag(courseTip);
+  bindOpenDoorDrag();
   courseTip.addEventListener('keydown',adjustCourseByKey);
+}else{
+  bindCourseDrag(dragHandle);
+}
+
+function bindOpenDoorDrag(){
+  // Keep the drag on the canvas even when the arrow disappears at 0 sm
+  // or the ship rotates. Native touch events also support iPad Safari.
+  let active=null;
+  function nearCourse(point){
+    const rect=canvas.getBoundingClientRect();
+    const x=point.clientX-rect.left;
+    const y=point.clientY-rect.top;
+    const origin=project(ship.x,ship.y);
+    if(Math.hypot(x-origin.x,y-origin.y)<=46)return true;
+    if(!plannedDistance)return false;
+    const tip=projectCourseTip();
+    return Math.hypot(x-tip.x,y-tip.y)<=26;
+  }
+  function begin(id,point){
+    if(active||moving||done||failed||!nearCourse(point))return false;
+    courseDragged=false;
+    active={id,x:point.clientX,y:point.clientY};
+    return true;
+  }
+  function adjust(point){
+    if(Math.hypot(point.clientX-active.x,point.clientY-active.y)>4)courseDragged=true;
+    if(courseDragged)aim(point);
+  }
+  canvas.addEventListener('pointerdown',event=>{
+    if(event.pointerType==='touch'||event.button!==0)return;
+    courseDragged=false;
+    if(!begin(event.pointerId,event))return;
+    canvas.setPointerCapture(event.pointerId);
+  });
+  canvas.addEventListener('pointermove',event=>{
+    if(event.pointerType!=='touch'&&active?.id===event.pointerId)adjust(event);
+  });
+  canvas.addEventListener('pointerup',event=>{
+    if(event.pointerType==='touch'||active?.id!==event.pointerId)return;
+    adjust(event);
+    active=null;
+  });
+  canvas.addEventListener('lostpointercapture',event=>{
+    if(active?.id===event.pointerId)active=null;
+  });
+  canvas.addEventListener('touchstart',event=>{
+    const touch=event.changedTouches[0];
+    if(touch&&begin('touch-'+touch.identifier,touch))event.preventDefault();
+  },{passive:false});
+  canvas.addEventListener('touchmove',event=>{
+    const touch=Array.from(event.changedTouches).find(item=>active?.id==='touch-'+item.identifier);
+    if(!touch)return;
+    event.preventDefault();
+    adjust(touch);
+  },{passive:false});
+  canvas.addEventListener('touchend',event=>{
+    const touch=Array.from(event.changedTouches).find(item=>active?.id==='touch-'+item.identifier);
+    if(!touch)return;
+    event.preventDefault();
+    adjust(touch);
+    active=null;
+  },{passive:false});
+  canvas.addEventListener('touchcancel',event=>{
+    if(Array.from(event.changedTouches).some(item=>active?.id==='touch-'+item.identifier))active=null;
+  });
 }
 function setPlannedCourse(heading,distance){
   if(moving||done||failed)return;
@@ -173,11 +241,15 @@ function adjustCourseByKey(event){
   const delta=(heading-ship.h+360)%360;
   setPlannedCourse(delta===180?ship.h:heading,delta===0?plannedDistance+0.5:delta===180?Math.max(0,plannedDistance-0.5):Math.max(0.5,plannedDistance));
 }
+function projectCourseTip(){
+  const angle=ship.h*Math.PI/180;
+  return project(ship.x+Math.sin(angle)*plannedDistance,ship.y+Math.cos(angle)*plannedDistance);
+}
 function drawCourse(origin){
   courseTip.hidden=!plannedDistance||moving||done||failed;
   if(courseTip.hidden)return;
   const angle=ship.h*Math.PI/180;
-  const tip=project(ship.x+Math.sin(angle)*plannedDistance,ship.y+Math.cos(angle)*plannedDistance);
+  const tip=projectCourseTip();
   courseTip.style.left=tip.x+'px';
   courseTip.style.top=tip.y+'px';
   const label=plannedDistance.toLocaleString('de-DE')+' sm';
@@ -266,7 +338,7 @@ $$('.steer').forEach((b,i)=>{const a=i*Math.PI/4;b.style.left=p.x+Math.sin(a)*69
 if(openDoorMode)drawCourse(p);
 canvas.setAttribute('aria-label',`Seekarte. Schiff nach ${dirNames[ship.h/45]}. Sichtbar: ${discovered.map(i=>islands[i].name).join(', ')}. ${discovered.length-1} von 4 Inseln entdeckt.`);
 }
-canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;for(const i of discovered){const p=project(islands[i].x,islands[i].y);if(Math.hypot(x-p.x,y-p.y)<Math.max(30,islands[i].r*p.s*1.6)){if(openDoorMode){if(i>0)openDoorArrival(i);return}$('#islandTitle').textContent=islands[i].name;$('#islandText').textContent=islands[i].info;$('#islandDialog').showModal();break}}});$('#closeIsland').onclick=()=>$('#islandDialog').close();
+canvas.addEventListener('click',e=>{if(openDoorMode&&courseDragged){courseDragged=false;return}const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;for(const i of discovered){const p=project(islands[i].x,islands[i].y);if(Math.hypot(x-p.x,y-p.y)<Math.max(30,islands[i].r*p.s*1.6)){if(openDoorMode){if(i>0)openDoorArrival(i);return}$('#islandTitle').textContent=islands[i].name;$('#islandText').textContent=islands[i].info;$('#islandDialog').showModal();break}}});$('#closeIsland').onclick=()=>$('#islandDialog').close();
 
 const questions=[{topic:'Kompassnadel',q:'Das Schiff dreht nach Osten. Wohin zeigt die rote Nordspitze der Nadel weiterhin?',a:['Nach Osten, wie das Schiff.','Ungefähr nach Norden.','Immer zum nächsten Hafen.'],right:1,why:'Die Nadel richtet sich im Erdmagnetfeld aus. Sie dreht sich nicht mit dem Schiff mit.'},{topic:'Kurswinkel',q:'Welcher Kurs führt nach Westen?',a:['90°','180°','270°'],right:2,why:'Von Nord im Uhrzeigersinn: Ost 90°, Süd 180°, West 270°.'},{topic:'Grenzen des Kompasses',q:'Was verrät dir ein Kompass allein?',a:['Eine Richtung.','Deinen genauen Ort.','Die Entfernung zum Ziel.'],right:0,why:'Für den Ort und die Entfernung brauchst du weitere Informationen, zum Beispiel eine Karte und die gefahrene Strecke.'},{topic:'Mehrschrittige Route',q:'Dein Auftrag: 2 sm nach Norden, dann 3 sm nach Osten. Wie fährst du?',a:['5 sm nach Nordost.','Erst 2 sm nach Norden. Dann das Schiff nach Osten drehen und 3 sm fahren.','Erst 3 sm nach Norden, dann 2 sm nach Osten.'],right:1,why:'Richtung, Entfernung und Reihenfolge müssen passen. Nordost ist nicht dasselbe wie zwei nacheinander gefahrene Richtungen.'}];
 function buildQuiz(){const f=$('#exitForm');f.innerHTML='';questions.forEach((q,i)=>{const fs=document.createElement('fieldset');const l=document.createElement('legend');l.textContent=`${i+1}. ${q.q} (1 P)`;fs.append(l);const a=document.createElement('div');a.className='answers';q.a.forEach((ans,j)=>{const lab=document.createElement('label'),input=document.createElement('input');input.type='radio';input.name='q'+i;input.value=j;input.required=true;lab.append(input,document.createTextNode(ans));a.append(lab)});fs.append(a);f.append(fs)});const b=document.createElement('button');b.className='primary';b.textContent='Ticket auswerten';f.append(b)}buildQuiz();
